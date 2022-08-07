@@ -3,24 +3,54 @@ import React from 'react'
 import styled from 'styled-components'
 import { auth, provider } from '../firebase'
 
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { selectUserEmail, selectUserName, selectUserPhoto, setUserLoginDetails,  } from '../features/user/userSlice'
+
 
 
 const Header = () => {
 
+  const dispatch = useDispatch();
+  const history = useNavigate();
+  const username = useSelector(selectUserName);
+  const userPhoto = useSelector(selectUserPhoto);
+  const userEmail = useSelector(selectUserEmail);
+
   const handleAuth = () => {
     console.log("called")
     signInWithPopup(auth, provider).then((result) => {
-      console.log(result)
+      console.log(result);
+      setUser(result.user);
     }).catch((error) => {
       console.log(error)
     })
   }
+
+  const setUser = (user) => {
+    dispatch(
+      setUserLoginDetails({
+        name:user.displayName,
+        email:user.email,
+        photo: user.photoURL,
+      })
+    )
+  }
+
   return (
     <Nav>
         <Logo>
             <img src='/images/logo.svg' alt='Disney+'></img>
         </Logo>
-        <NavMenu>
+        {
+          !username ? <Login onClick={handleAuth} >Login</Login> : <>
+          {/* <NavMenu>
+          <a href='/home' >
+            <img src='/images/home-icon.svg' alt='HOME' />
+          <span>HOME</span>
+          </a>
+          </NavMenu> */}
+          <NavMenu>
           <a href='/home' >
             <img src='/images/home-icon.svg' alt='HOME' />
           <span>HOME</span>
@@ -46,7 +76,11 @@ const Header = () => {
           <span>SERIES</span>
           </a>
         </NavMenu>
-        <Login onClick={handleAuth} >Login</Login>
+        <UserImg src={userPhoto} alt={username} />
+          </>
+        }
+        
+        {/* <Login onClick={handleAuth} >Login</Login> */}
     </Nav>
   )
 }
@@ -162,5 +196,10 @@ transition : all .2s ease 0s;
   border-color : transparent;
 }
 `
+
+const UserImg = styled.img`
+height : 100%;
+
+`;
 
 export default Header
