@@ -1,7 +1,20 @@
+import { signInWithPopup } from 'firebase/auth'
 import React from 'react'
 import styled from 'styled-components'
+import { auth, provider } from '../firebase'
+
+
 
 const Header = () => {
+
+  const handleAuth = () => {
+    console.log("called")
+    signInWithPopup(auth, provider).then((result) => {
+      console.log(result)
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
   return (
     <Nav>
         <Logo>
@@ -33,7 +46,7 @@ const Header = () => {
           <span>SERIES</span>
           </a>
         </NavMenu>
-        <Login>Login</Login>
+        <Login onClick={handleAuth} >Login</Login>
     </Nav>
   )
 }
