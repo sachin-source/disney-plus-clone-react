@@ -1,5 +1,5 @@
 import { signInWithPopup } from 'firebase/auth'
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { auth, provider } from '../firebase'
 
@@ -16,6 +16,15 @@ const Header = () => {
   const username = useSelector(selectUserName);
   const userPhoto = useSelector(selectUserPhoto);
   const userEmail = useSelector(selectUserEmail);
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        history('/home')
+      }
+    })
+  }, [username])
 
   const handleAuth = () => {
     console.log("called")
@@ -76,7 +85,7 @@ const Header = () => {
           <span>SERIES</span>
           </a>
         </NavMenu>
-        <UserImg src={userPhoto} alt={username} />
+        <UserImg src={userPhoto} alt={username} referrerpolicy="no-referrer" />
           </>
         }
         
