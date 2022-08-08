@@ -1,11 +1,11 @@
-import { signInWithPopup } from 'firebase/auth'
+import { signInWithPopup, signOut } from 'firebase/auth'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { auth, provider } from '../firebase'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { selectUserEmail, selectUserName, selectUserPhoto, setUserLoginDetails,  } from '../features/user/userSlice'
+import { selectUserEmail, selectUserName, selectUserPhoto, setSignOutState, setUserLoginDetails,  } from '../features/user/userSlice'
 
 
 
@@ -28,12 +28,21 @@ const Header = () => {
 
   const handleAuth = () => {
     console.log("called")
-    signInWithPopup(auth, provider).then((result) => {
-      console.log(result);
-      setUser(result.user);
-    }).catch((error) => {
-      console.log(error)
-    })
+    if (username) {
+      signInWithPopup(auth, provider).then((result) => {
+        console.log(result);
+        setUser(result.user);
+      }).catch((error) => {
+        console.log(error)
+      })
+    } else {
+      signOut().then(() => {
+        dispatch(setSignOutState());
+        history('/')
+      }).catch((err) => {
+        alert(err.message)
+      })
+    }
   }
 
   const setUser = (user) => {
@@ -85,7 +94,12 @@ const Header = () => {
           <span>SERIES</span>
           </a>
         </NavMenu>
+        <SignOut>
         <UserImg src={userPhoto} alt={username} referrerpolicy="no-referrer" />
+        <DropDown>
+          <span onClick={handleAuth}>signout</span>
+        </DropDown>
+        </SignOut>
           </>
         }
         
@@ -208,7 +222,45 @@ transition : all .2s ease 0s;
 
 const UserImg = styled.img`
 height : 100%;
-
 `;
 
+
+const DropDown = styled.div`
+position: absolute;
+top : 48px;
+right : 0px;
+background : rgb(19, 19, 19);
+border : 1px solid rgba(151, 151, 151, 0.34);
+border-radius : 4px;
+box-shadow : rgb(0 0 0 /50% ) 0px 0px 18px 0px;
+padding : 10px;
+font-size: 14px;
+letter-spacing: 3px;
+width : 100px;
+opacity: 0;
+`
+
+const SignOut = styled.div`
+position : relative;
+height : 48px;
+width : 48px;
+display : flex;
+cursor: pointer;
+align-items: center;
+justify-content: center;
+
+${UserImg} {
+  border-radius: 50%;
+  width : 100%;
+  height : 100%
+}
+
+&:hover {
+  ${DropDown} {
+    opacity : 1;
+    transition-duration : 1s;
+  }
+}
+
+`
 export default Header
