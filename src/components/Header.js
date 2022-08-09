@@ -1,4 +1,4 @@
-import { signInWithPopup, signOut } from 'firebase/auth'
+import { signInWithPopup, getAuth, signOut } from 'firebase/auth'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { auth, provider } from '../firebase'
@@ -28,7 +28,8 @@ const Header = () => {
 
   const handleAuth = () => {
     console.log("called")
-    if (username) {
+    if (!username) {
+      console.log("no username")
       signInWithPopup(auth, provider).then((result) => {
         console.log(result);
         setUser(result.user);
@@ -36,7 +37,9 @@ const Header = () => {
         console.log(error)
       })
     } else {
-      signOut().then(() => {
+      console.log("username");
+      const auth = getAuth();
+      signOut(auth).then(() => {
         dispatch(setSignOutState());
         history('/')
       }).catch((err) => {
@@ -199,9 +202,9 @@ a {
 
 
 
-// @media (max-width : 768px) {
-//   display : none;
-// }
+@media (max-width : 768px) {
+  display : none;
+}
 `
 
 const Login = styled.a`
